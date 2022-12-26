@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QScreen>
+#include <QHttpServer>
 
 #include "httpwindow.h"
 
@@ -19,6 +20,29 @@ int main(int argc, char *argv[])
 #else
     httpWin.show();
 #endif
+
+    QHttpServer httpServer; //http 서버 변수 선언
+
+    httpServer.route("/", []() {
+        //return "Hello world";           //웹 페이지에 출력할 구문
+        QString str = "hello";
+        return str;
+    });
+
+    httpServer.afterRequest([](QHttpServerResponse &&resp) {
+        resp.setHeader("Server", "Super server!");
+        return std::move(resp);
+    });
+
+    const auto port = httpServer.listen(QHostAddress::Any);
+    if (!port) {
+        qDebug() << QCoreApplication::translate(
+                "QHttpServerExample", "Server failed to listen on a port.");
+        return 0;
+    }
+
+    qDebug() << QCoreApplication::translate(
+            "QHttpServerExample", "Running on http://127.0.0.1:%1/ (Press CTRL+C to quit)").arg(port);
 
     return app.exec();
 }

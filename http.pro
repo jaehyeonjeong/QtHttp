@@ -1,4 +1,4 @@
-QT += network widgets
+QT += network widgets httpserver
 
 HEADERS += httpwindow.h
 SOURCES += httpwindow.cpp \
